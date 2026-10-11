@@ -1,0 +1,31 @@
+name: Mirror to GitLab
+
+on:
+  push:
+    branches:
+      - '**'
+    tags:
+      - '**'
+  workflow_dispatch:
+
+jobs:
+  mirror:
+    name: Sync to GitLab
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Push all branches and tags to GitLab
+        run: |
+          # Configure git
+          git config --global user.name "GitHub Sync Bot"
+          git config --global user.email "bot@github.com"
+          
+          # Push mirror with GitLab Personal Access Token
+          GITLAB_REPO_URL="https://oauth2:${{ secrets.GITLAB_TOKEN }}@gitlab.com/coderboygalif/freelance-marketplace-project-client.git"
+          
+          echo "Mirroring to GitLab: coderboygalif/freelance-marketplace-project-client..."
+          git push --mirror "$GITLAB_REPO_URL"
